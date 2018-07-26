@@ -4,6 +4,7 @@ import ime.table.SingleWordTable;
 import ime.bean.BaseWord;
 import ime.table.MultiWordTable;
 import ime.table.SingleWordTable;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.HashSet;
@@ -84,13 +85,17 @@ public class SimpleTrie<T extends SimpleTrie.TrieNodeable> {
             return;
         }
         for (String str : object.getString()) {
+            if (StringUtils.isEmpty(str)) {
+                continue;
+            }
             TrieNode node = root;
+            node.num++;
             char[] letters = str.toCharArray();
-            for (int i = 0; i < str.length(); i++) {
-                int pos = letters[i] - START_CHAR;
+            for (char c : letters) {
+                int pos = c - START_CHAR;
                 if (node.son[pos] == null) {
                     node.son[pos] = new TrieNode<T>();
-                    node.son[pos].val = letters[i];
+                    node.son[pos].val = c;
                 } else {
                     node.son[pos].num++;
                 }
@@ -106,13 +111,13 @@ public class SimpleTrie<T extends SimpleTrie.TrieNodeable> {
      * 计算单词前缀的数量
      */
     public int countPrefix(String prefix) {
-        if (prefix == null || prefix.length() == 0) {
+        if (prefix == null) {
             return -1;
         }
         TrieNode node = root;
         char[] letters = prefix.toCharArray();
-        for (int i = 0, len = prefix.length(); i < len; i++) {
-            int pos = letters[i] - START_CHAR;
+        for (char c : letters) {
+            int pos = c - START_CHAR;
             if (node.son[pos] == null) {
                 return 0;
             } else {
@@ -206,28 +211,4 @@ public class SimpleTrie<T extends SimpleTrie.TrieNodeable> {
     }
 
 
-    public static void main(String[] args) {
-
-        File file=new File("src\\main\\resources\\file\\THUOCL_it.txt");
-        System.out.println(file.getAbsolutePath());
-
-        SimpleTrie<BaseWord> simpleTrie = new SimpleTrie<>();
-        for (BaseWord baseWord : MultiWordTable.loadWordBankList(file.getAbsolutePath())) {
-            simpleTrie.insert(baseWord);
-        }
-        Scanner in = new Scanner(System.in);
-        while (in.hasNextLine()) {
-            String input = in.nextLine();
-            if (!"exit".equals(input)) {
-                Set<BaseWord> set = simpleTrie.getObject(input);
-                for (BaseWord word : set) {
-                    System.out.print(word.originalStr + " ");
-                }
-                System.out.println();
-            }
-        }
-//
-//        simpleTrie.preTraverse(simpleTrie.getRoot());
-
-    }
 }
