@@ -1,8 +1,12 @@
 import ime.bean.BaseWord;
 import ime.table.MultiWordTable;
 import ime.trie.SimpleTrie;
+import net.sourceforge.pinyin4j.PinyinHelper;
+import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
+import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 
-import java.io.File;
+import java.io.*;
+import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -12,36 +16,41 @@ import java.util.Set;
  */
 public class Test {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
-        File file = new File("src\\main\\resources\\file\\THUOCL_it.txt");
         File file2 = new File("src\\main\\resources\\file\\commonwords.txt");
 
-        System.out.println(file.getAbsolutePath());
+        File outputFile = new File("src\\main\\resources\\file\\output");
 
-        SimpleTrie<BaseWord> simpleTrie = new SimpleTrie<>();
-        for (BaseWord baseWord : MultiWordTable.loadWordBankList(file, " \t ")) {
-            simpleTrie.insert(baseWord);
-        }
-        for (BaseWord baseWord : MultiWordTable.loadWordBankList(file2)) {
-            simpleTrie.insert(baseWord);
-        }
-        System.out.println("trie.size="+simpleTrie.countPrefix(""));
-        Scanner in = new Scanner(System.in);
-        while (in.hasNextLine()) {
-            String input = in.nextLine();
-            if (!"exit".equals(input)) {
-                long start = System.currentTimeMillis();
-                Set<BaseWord> set = simpleTrie.getObject(input);
-                long runningTime = System.currentTimeMillis() - start;
-                for (BaseWord word : set) {
-                    System.out.print(word.originalStr + " ");
+        try {
+            //获取assets资源管理器
+
+            //通过管理器打开文件并读取
+            BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(file2)));
+            BufferedWriter out = new BufferedWriter(new FileWriter(outputFile, true));
+
+            String line;
+            HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
+            format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+            while ((line = bf.readLine()) != null) {
+                String[] pinyins = PinyinHelper.toHanyuPinyinStringArray(line.toCharArray()[0], format);
+                Set<String> set = new HashSet<>();
+                for (String s : pinyins) {
+                    set.add(s);
                 }
-                System.out.println("\n查找时间：" + runningTime+"ms");
+                for(String s:set){
+                    out.write("'" + s + " " + line + "\n");
+                }
+
+
             }
+            out.write("\n}");
+            out.flush();
+            out.close();
+//            System.out.println(sb);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-//
-//        simpleTrie.preTraverse(simpleTrie.getRoot());
 
     }
 

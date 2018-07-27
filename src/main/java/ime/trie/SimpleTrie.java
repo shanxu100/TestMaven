@@ -1,15 +1,9 @@
 package ime.trie;
 
-import ime.table.SingleWordTable;
-import ime.bean.BaseWord;
-import ime.table.MultiWordTable;
-import ime.table.SingleWordTable;
-import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * 数字——字典树
@@ -55,7 +49,7 @@ public class SimpleTrie<T extends SimpleTrie.TrieNodeable> {
         /**
          * 当前节点挂载的 对象 集合
          */
-        private Set<S> mountSet = new HashSet<>();
+        private Set<S> mountSet = new HashSet<>(512);
 
         public TrieNode() {
             num = 1;
@@ -85,17 +79,13 @@ public class SimpleTrie<T extends SimpleTrie.TrieNodeable> {
             return;
         }
         for (String str : object.getString()) {
-            if (StringUtils.isEmpty(str)) {
-                continue;
-            }
             TrieNode node = root;
-            node.num++;
             char[] letters = str.toCharArray();
-            for (char c : letters) {
-                int pos = c - START_CHAR;
+            for (int i = 0; i < str.length(); i++) {
+                int pos = letters[i] - START_CHAR;
                 if (node.son[pos] == null) {
                     node.son[pos] = new TrieNode<T>();
-                    node.son[pos].val = c;
+                    node.son[pos].val = letters[i];
                 } else {
                     node.son[pos].num++;
                 }
@@ -111,13 +101,13 @@ public class SimpleTrie<T extends SimpleTrie.TrieNodeable> {
      * 计算单词前缀的数量
      */
     public int countPrefix(String prefix) {
-        if (prefix == null) {
+        if (prefix == null || prefix.length() == 0) {
             return -1;
         }
         TrieNode node = root;
         char[] letters = prefix.toCharArray();
-        for (char c : letters) {
-            int pos = c - START_CHAR;
+        for (int i = 0, len = prefix.length(); i < len; i++) {
+            int pos = letters[i] - START_CHAR;
             if (node.son[pos] == null) {
                 return 0;
             } else {
@@ -136,10 +126,12 @@ public class SimpleTrie<T extends SimpleTrie.TrieNodeable> {
      * @param resultSet
      */
     public void preTraverse(TrieNode node, Set<T> resultSet) {
+        if (resultSet == null) {
+            return;
+        }
         resultSet.addAll(node.mountSet);
         for (TrieNode child : node.son) {
-            if (child != null && resultSet != null) {
-                resultSet.addAll(child.mountSet);
+            if (child != null) {
                 preTraverse(child, resultSet);
             }
         }
@@ -155,7 +147,7 @@ public class SimpleTrie<T extends SimpleTrie.TrieNodeable> {
      * @return
      */
     public Set<T> getObject(String prefix) {
-        Set<T> resultSet = new HashSet<>();
+        Set<T> resultSet = new TreeSet<>();
         TrieNode node = has(prefix);
         if (node != null) {
             preTraverse(node, resultSet);
@@ -165,7 +157,10 @@ public class SimpleTrie<T extends SimpleTrie.TrieNodeable> {
 
 
     /**
-     * 在字典树中查找一个完全匹配的单词
+     * 在字典树中查找某一结点
+     *
+     * @param str
+     * @return null，该节点不存在；否则返回该节点
      */
     public TrieNode has(String str) {
         if (str == null || str.length() == 0) {

@@ -1,6 +1,8 @@
 package ime.table;
 
 
+
+
 import ime.bean.BaseWord;
 
 import java.io.*;
@@ -9,26 +11,21 @@ import java.util.List;
 
 public class MultiWordTable {
 
-    public static final String WORD_BANK = "THUOCL_it.txt";
     public static final String defaultRegex = " ";
 
 
-    public static List<BaseWord> loadWordBankList(File file) {
-        return loadWordBankList(file, defaultRegex);
+    public static List<BaseWord> loadWordBankList(InputStream inputStream) {
+        return loadWordBankList(inputStream, defaultRegex);
     }
 
-    public static List<BaseWord> loadWordBankList(File file, String regex) {
+    public static List<BaseWord> loadWordBankList(InputStream inputStream, String regex) {
         List<BaseWord> list = new LinkedList<>();
         try {
-            //获取assets资源管理器
-
-            //通过管理器打开文件并读取
-            BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            BufferedReader bf = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = bf.readLine()) != null) {
                 //TODO 这里读取一行
-                String[] ss = line.split(regex);
-                BaseWord baseWord = new BaseWord(ss[0]);
+                BaseWord baseWord = new BaseWord(line);
                 list.add(baseWord);
             }
         } catch (IOException e) {
@@ -36,5 +33,6 @@ public class MultiWordTable {
         }
         return list;
     }
+
 
 }

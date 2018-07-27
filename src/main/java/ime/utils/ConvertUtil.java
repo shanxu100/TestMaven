@@ -5,6 +5,7 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import org.apache.commons.lang3.StringUtils;
 
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +19,12 @@ public class ConvertUtil {
         format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
     }
 
+    /**
+     * 将 不带拼音的 中文字符串 转换为数字字符串
+     *
+     * @param originalStr
+     * @return
+     */
     public static Set<String> covertHanziIntoNum(String originalStr) {
         if (StringUtils.isEmpty(originalStr)) {
             return new HashSet<>();
@@ -30,7 +37,7 @@ public class ConvertUtil {
             int initialCapacity = 1;
             for (char word : words) {
                 String[] pinyins = PinyinHelper.toHanyuPinyinStringArray(word, format);
-                if (pinyins==null){
+                if (pinyins == null) {
                     continue;
                 }
                 Set<String> numSet = convertPinyinIntoNum(pinyins);
@@ -45,6 +52,37 @@ public class ConvertUtil {
         } catch (Exception e) {
             e.printStackTrace();
             return new HashSet<>();
+        }
+    }
+
+
+    /**
+     * 将 带拼音的 中文字符串 转换为数字字符串
+     * <p>
+     * "带拼音的 中文字符串" 格式为：'da'sha'te'sha 大杀特杀
+     * 这种情况，不需要考虑多音字
+     *
+     * @param pinyin
+     * @return
+     */
+    public static Set<String> covertHanziWithPinyinIntoNum(String pinyin) {
+        if (StringUtils.isEmpty(pinyin)) {
+            return new HashSet<>();
+        }
+
+        try {
+            String[] sentencePinyin = pinyin.split("\'");
+            List<String> list = new ArrayList<>(sentencePinyin.length);
+
+            for (String s : sentencePinyin) {
+                list.add(convertPinyinIntoNum(s));
+            }
+            return combination(list);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return combination(null);
         }
     }
 
@@ -97,19 +135,19 @@ public class ConvertUtil {
      * @param resultSet
      */
     private static void generate(List<Set<String>> list, int startPosition, String prefix, Set<String> resultSet) {
-        if (list.size()==0){
+        if (list.size() == 0) {
             return;
         }
         if (startPosition >= list.size()) {
 
             //将 全拼 加入set中
-            resultSet.add(prefix.replaceAll(" ",""));
+            resultSet.add(prefix.replaceAll(" ", ""));
 
             //将 首字母 加入set中
-            String[] ss=prefix.split(" ");
-            StringBuilder sb=new StringBuilder(ss.length);
-            for(String s:ss){
-                if (s.length()==0){
+            String[] ss = prefix.split(" ");
+            StringBuilder sb = new StringBuilder(ss.length);
+            for (String s : ss) {
+                if (s.length() == 0) {
                     System.out.println();
                 }
                 sb.append(s.charAt(0));
@@ -126,9 +164,39 @@ public class ConvertUtil {
 
     }
 
-    public static void main(String[] args){
+    /**
+     * 按照 全拼和首字母 两种情况，组合成对应的 字符串
+     * TODO 后期应该考虑 全拼和首字母 混合的情况
+     *
+     * @param list
+     */
+    private static Set<String> combination(List<String> list) {
+        if (list == null || list.size() == 0) {
+            return new HashSet<>();
+        }
+        Set<String> resultSet = new HashSet<>(list.size());
+        //存储 全拼
+        StringBuilder sb1 = new StringBuilder();
+        //存储 首字母
+        StringBuilder sb2 = new StringBuilder();
 
-        covertHanziIntoNum("行");
+        for (String s : list) {
+            if (StringUtils.isEmpty(s)) {
+                continue;
+            }
+            sb1.append(s);
+            sb2.append(s.charAt(0));
+        }
+        resultSet.add(sb1.toString());
+        resultSet.add(sb2.toString());
+
+        return resultSet;
+
+    }
+
+    public static void main(String[] args) {
+
+        covertHanziWithPinyinIntoNum("'da'mo'quan'wang");
 
     }
 

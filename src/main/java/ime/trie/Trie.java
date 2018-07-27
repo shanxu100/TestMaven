@@ -1,7 +1,7 @@
 package ime.trie;
 
 /**
- * 数字——字典树
+ * 普通——字典树
  *
  * @author gzs11641
  */
