@@ -1,8 +1,6 @@
 package ime.table;
 
 
-
-
 import ime.bean.BaseWord;
 
 import java.io.*;
@@ -20,8 +18,9 @@ public class MultiWordTable {
 
     public static List<BaseWord> loadWordBankList(InputStream inputStream, String regex) {
         List<BaseWord> list = new LinkedList<>();
+        BufferedReader bf = null;
         try {
-            BufferedReader bf = new BufferedReader(new InputStreamReader(inputStream));
+            bf = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = bf.readLine()) != null) {
                 //TODO 这里读取一行
@@ -30,6 +29,14 @@ public class MultiWordTable {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (bf != null) {
+                try {
+                    bf.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return list;
     }

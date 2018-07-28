@@ -12,7 +12,7 @@ public class BaseWord implements SimpleTrie.TrieNodeable, Comparable<BaseWord> {
     public String originalStr;
     public String pinyin;
     public int length;
-    public int DF = 1000;
+    public double DF = 1000;
 
     public Set<String> numSet;
 
