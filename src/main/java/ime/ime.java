@@ -1,10 +1,8 @@
 package ime;
 
-import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 
-import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;

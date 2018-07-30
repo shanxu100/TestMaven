@@ -5,7 +5,6 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import org.apache.commons.lang3.StringUtils;
 
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -65,16 +64,14 @@ public class ConvertUtil {
      * @param pinyin
      * @return
      */
-    public static Set<String> covertHanziWithPinyinIntoNum(String pinyin) {
-        if (StringUtils.isEmpty(pinyin)) {
+    public static Set<String> covertHanziWithPinyinIntoNum(String[] pinyin) {
+        if (pinyin == null || pinyin.length == 0) {
             return new HashSet<>();
         }
 
         try {
-            String[] sentencePinyin = pinyin.split("\'");
-            List<String> list = new ArrayList<>(sentencePinyin.length);
-
-            for (String s : sentencePinyin) {
+            List<String> list = new ArrayList<>(pinyin.length);
+            for (String s : pinyin) {
                 list.add(convertPinyinIntoNum(s));
             }
             return combination(list);
@@ -196,7 +193,7 @@ public class ConvertUtil {
 
     public static void main(String[] args) {
 
-        covertHanziWithPinyinIntoNum("'da'mo'quan'wang");
+//        covertHanziWithPinyinIntoNum("'da'mo'quan'wang");
 
     }
 
